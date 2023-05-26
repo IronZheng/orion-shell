@@ -94,8 +94,8 @@ case $CHOICE in
         nginx
         ;;
     3)
-        echo "Restarting service..."
-        # 执行重启操作
+        echo "Restarting docker..."
+        docker
         ;;
     4)
         echo "Checking status..."
