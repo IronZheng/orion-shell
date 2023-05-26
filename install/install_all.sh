@@ -7,6 +7,7 @@ echo "2. maven"
 echo "3. nginx"
 echo "4. docker"
 echo "5. nodejs"
+echo "6. jenkins"
 
 # 获取用户的选择
 read -p "Enter your choice (1-4): " CHOICE
