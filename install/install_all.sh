@@ -6,11 +6,27 @@ echo "1. java8"
 echo "2. maven"
 echo "3. nginx"
 echo "4. docker"
-echo "5. Status"
+echo "5. nodejs"
 
 # 获取用户的选择
 read -p "Enter your choice (1-4): " CHOICE
 
+node(){
+  # node v18
+
+  node=node-v18.16.0-linux-x64
+  wget https://nodejs.org/dist/v18.16.0/${node}.tar.xz
+
+  tar -xf ${node}.tar.xz
+
+  ln -s ${pwd}/${node}/bin/node /usr/local/bin/node
+  ln -s ${pwd}/${node}/bin/npm /usr/local/bin/npm
+
+  echo 'export PATH=$PATH:${pwd}/${node}/bin' | sudo tee -a /etc/profile
+
+  node -v
+  npm -v
+}
 #检查程序是否在运行
 maven(){
   #!/bin/bash
@@ -159,7 +175,7 @@ case $CHOICE in
         ;;
     5)
         echo "Checking status..."
-        # 执行状态查询操作
+        node
         ;;
     *)
         echo "Invalid choice."
