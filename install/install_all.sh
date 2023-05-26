@@ -19,7 +19,7 @@ maven(){
   cp /etc/profile /etc/profile.bak_$TIME_FLAG
   echo -e "Begin to install maven,Please waiting..."
   #解压maven
-  wget http://mirrors.tuna.tsinghua.edu.cn/apache/maven/maven-3/3.6.2/binaries/apache-maven-3.6.2-bin.tar.gz
+  wget https://dlcdn.apache.org/maven/maven-3/3.9.2/binaries/apache-maven-3.9.2-bin.tar.gz
   tar zxvf apache-maven-*-bin.tar.gz
   mkdir /usr/local/maven
   mv apache-maven-*/* /usr/local/maven
