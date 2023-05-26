@@ -3,8 +3,8 @@
 # 显示选项列表
 echo "Please select an action:"
 echo "1. maven"
-echo "2. Stop"
-echo "3. Restart"
+echo "2. nginx"
+echo "3. docker"
 echo "4. Status"
 
 # 获取用户的选择
@@ -32,6 +32,57 @@ maven(){
   echo -e "Maven installation completed"
 }
 
+nginx(){
+  #!/bin/bash
+  [ $(id -u) != "0" ]&& echo "error,not root user" && exit 1
+  #检测当前用户是否为root用户
+  if [ ! -d /opt ];then
+  #判断/opt目录是否存在
+  mkdir /opt && cd /opt
+  else
+  cd /opt
+  fi
+
+  a=nginx-1.17.6
+  wget http://nginx.org/download/${a}.tar.gz
+
+  if [ $? -eq 0 ];then
+  #下载完成后$?的值，如果等于0则解压，不等于0则异常退出
+  tar zxf $a.tar.gz
+  else
+  echo "下载错误！"
+  exit 1
+  fi
+  nginxu=`awk -F: '$0~/nginx/' /etc/passwd|wc -l`
+  nginxg=`awk -F: '$0~/nginx/' /etc/group|wc -l`
+  #给nginx用户和组设置变量
+  if [ $nginxu -ne 0 ] && [ $nginxg -ne 0 ];then
+  #判断nginx用户和组是否存在，不存在则创建
+  echo "nginx用户和组已存在"
+  else
+  useradd -M -s /sbin/nologin nginx
+  fi
+  yum install gcc gcc-c++ pcre pcre-devel zlib-devel openssl openssl-devel libtool -y
+  cd /opt/$a
+  CFLAGS=" -pipe  -O -W -Wall -Wpointer-arith -Wno-unused-parameter -g" ./configure \
+  --prefix=/usr/local/nginx \
+  --user=nginx \
+  --group=nginx \
+  --with-http_stub_status_module --with-http_ssl_module --with-http_realip_module
+  make && make install
+  if [ $? -eq 0 ];then
+  #安装成功$?输出为0时，创建nginx命令软链接。
+  ln -s /usr/local/nginx/sbin/nginx /usr/local/sbin/
+  else
+  echo "安装失败!!!"
+  fi
+}
+
+docker(){
+  curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun
+  docker -v
+}
+
 # 根据用户的选择执行对应的操作
 case $CHOICE in
     1)
@@ -39,8 +90,8 @@ case $CHOICE in
         maven
         ;;
     2)
-        echo "Stopping service..."
-        # 执行停止操作
+        echo "Stopping nginx..."
+        nginx
         ;;
     3)
         echo "Restarting service..."
