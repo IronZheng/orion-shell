@@ -2,10 +2,11 @@
 
 # 显示选项列表
 echo "Please select an action:"
-echo "1. maven"
-echo "2. nginx"
-echo "3. docker"
-echo "4. Status"
+echo "1. java8"
+echo "2. maven"
+echo "3. nginx"
+echo "4. docker"
+echo "5. Status"
 
 # 获取用户的选择
 read -p "Enter your choice (1-4): " CHOICE
@@ -13,6 +14,12 @@ read -p "Enter your choice (1-4): " CHOICE
 #检查程序是否在运行
 maven(){
   #!/bin/bash
+  DIR="/home/soft/maven"
+  if [ ! -d "$DIR" ]; then
+    mkdir -p "$DIR"
+  fi
+  cd $DIR
+
   #得到时间
   TIME_FLAG=`date +%Y%m%d_%H%M%S`
   #备份配置文件
@@ -83,21 +90,74 @@ docker(){
   docker -v
 }
 
+jdk8(){
+  #!/bin/bash
+  #offline jdk install
+  # jdk安装目录
+  ipath="/home/soft/java"
+  installpath=$(cd `dirname $0`; pwd)
+  j=`whereis java`
+  java=$(echo ${j} | grep "jdk")
+  if [[ "$java" != "" ]]
+  then
+      echo "java was installed!"
+  else
+      echo "java not installed!"
+      echo;
+      echo "解压 jdk-*-linux-x64.tar.gz"
+      tar -zxvf jdk-*-linux-x64.tar.gz >/dev/null 2>&1
+      echo;
+      cd jdk* && jdkname=`pwd | awk -F '/' '{print $NF}'`
+      echo "获取jdk版本: ${jdkname}"
+      echo;
+      cd ${installpath}
+      echo "获取当前目录:${installpath}"
+      echo;
+      mv ${jdkname} ${ipath}
+      echo "转移${jdkname}文件到${ipath}安装目录"
+      echo "jdk安装目录:${ipath}/${jdkname}"
+      echo;
+      echo "#java jdk" >> /etc/profile
+      echo "export JAVA_HOME=${ipath}/${jdkname}" >> /etc/profile
+      echo 'export JRE_HOME=${JAVA_HOME}/jre' >> /etc/profile
+      echo 'export CLASSPATH=.:${JAVA_HOME}/lib:${JRE_HOME}/lib' >> /etc/profile
+      echo 'export PATH=${JAVA_HOME}/bin:$PATH' >> /etc/profile
+      source /etc/profile > /dev/null 2>&1
+      echo "jdk 安装完毕!"
+      echo;
+      echo "生效检测"
+      echo;
+      echo "检测java功能"
+      java
+      echo;
+      echo "检测javac功能"
+      javac
+      echo;
+      echo "检测java版本"
+      java -version
+      echo;
+  fi
+}
+
 # 根据用户的选择执行对应的操作
 case $CHOICE in
     1)
+        echo "Starting install jdk8 ..."
+        jdk8
+        ;;
+    2)
         echo "Starting install maven..."
         maven
         ;;
-    2)
+    3)
         echo "Stopping nginx..."
         nginx
         ;;
-    3)
+    4)
         echo "Restarting docker..."
         docker
         ;;
-    4)
+    5)
         echo "Checking status..."
         # 执行状态查询操作
         ;;
